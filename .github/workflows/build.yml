@@ -17,6 +17,8 @@ jobs:
   build:
     name: Build BeatWave Release APK
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     env:
       SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
       ADDON_CLIENT_SECRET: ${{ secrets.ADDON_CLIENT_SECRET }}
@@ -71,7 +73,21 @@ jobs:
           RELEASE_STORE_PASSWORD: ${{ secrets.KEY_STORE_PASSWORD || secrets.RELEASE_STORE_PASSWORD || steps.keystore.outputs.store_pass }}
           RELEASE_KEY_ALIAS: ${{ secrets.ALIAS || secrets.RELEASE_KEY_ALIAS || steps.keystore.outputs.key_alias || 'release_key' }}
           RELEASE_KEY_PASSWORD: ${{ secrets.KEY_PASSWORD || secrets.RELEASE_KEY_PASSWORD || steps.keystore.outputs.key_pass }}
-        run: ./gradlew assembleRelease --stacktrace
+        run: |
+          set +e
+          ./gradlew assembleRelease --stacktrace 2>&1 | tee gradle_build.log
+          BUILD_EXIT=${PIPESTATUS[0]}
+          if [ "$BUILD_EXIT" -ne 0 ]; then
+            grep -E "(^e: |FAILURE:|What went wrong|^> |Exception:|Error:)" gradle_build.log | head -n 40 | while IFS= read -r line; do
+              clean_line=$(echo "$line" | tr -d '\r')
+              echo "::error title=GradleCompile::$clean_line"
+            done
+            tail -n 35 gradle_build.log | while IFS= read -r line; do
+              clean_line=$(echo "$line" | tr -d '\r')
+              echo "::warning title=GradleTail::$clean_line"
+            done
+            exit "$BUILD_EXIT"
+          fi
 
       - name: Stage Final APK
         id: prep_apk
@@ -79,7 +95,7 @@ jobs:
           mkdir -p final_apk
           VERSION=$(grep 'versionName = ' app/build.gradle.kts | head -n1 | sed -E 's/.*"([^"]+)".*/\1/')
           if [ -z "$VERSION" ]; then
-            VERSION="1.11.0"
+            VERSION="5.0.0"
           fi
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "APP_VERSION=$VERSION" >> $GITHUB_ENV
@@ -107,9 +123,23 @@ jobs:
           (cd final_apk && sha256sum *.apk > SHA256SUMS.txt)
           cat final_apk/SHA256SUMS.txt
 
-      - name: Upload BeatWave Release APK
+      - name: Upload BeatWave Release APK Artifact
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: BeatWave-v${{ steps.prep_apk.outputs.version }}-APK
           path: final_apk/*
           if-no-files-found: error
+
+      - name: Publish BeatWave Direct APK Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG="v${{ steps.prep_apk.outputs.version }}-beatwave"
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" final_apk/* --clobber
+          else
+            gh release create "$TAG" final_apk/* \
+              --target "${{ github.sha }}" \
+              --title "BeatWave v${{ steps.prep_apk.outputs.version }} (Cyber Edition)" \
+              --notes "BeatWave Cyber Acoustic Edition by mokka coding (@dark.shadow_4531). Includes Cyber Sound Lab & 432Hz Tuner, Listener Profile & Telemetry Hub, High-Animation Cyber About Screen, and First-Launch Cyber Onboarding."
+          fi
