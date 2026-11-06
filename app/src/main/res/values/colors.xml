@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="splash_background">#FF080B16</color>
+
+    <!-- BeatWave adaptive launcher backgrounds -->
+    <color name="ic_launcher_background">#FF080B16</color>
+    <color name="ic_launcher_background_desktop">#FF0E122A</color>
+    <color name="ic_launcher_background_white">#FFFFFFFF</color>
+    <color name="ic_launcher_background_black">#FF000000</color>
+</resources>

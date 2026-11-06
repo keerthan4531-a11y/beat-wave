@@ -1,0 +1,16 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- BeatWave Cyber Sonic Pulse Crest (fits inside 66dp safe zone for monochrome themed icon) -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M54,24 L69,48 L63.5,48 L54,33 L44.5,48 L39,48 Z" />
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M54,84 L39,62 L44.5,62 L54,75 L63.5,62 L69,62 Z" />
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M24,54 L36,51.5 L40.5,41 L46.5,63 L54,37 L61.5,65 L67.5,45 L72,51.5 L84,54 L70.5,56.8 L67.5,52 L61.5,73 L54,48 L46.5,71 L40.5,49.5 L37.5,56.8 Z" />
+</vector>

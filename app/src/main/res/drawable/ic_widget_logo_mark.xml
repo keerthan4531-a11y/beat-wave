@@ -1,0 +1,16 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- BeatWave Widget Sonic Mark -->
+    <path
+        android:fillColor="@color/widget_on_surface_variant"
+        android:pathData="M54,12 L75,45 L67,45 L54,24 L41,45 L33,45 Z" />
+    <path
+        android:fillColor="@color/widget_on_surface_variant"
+        android:pathData="M54,96 L33,65 L41,65 L54,84 L67,65 L75,65 Z" />
+    <path
+        android:fillColor="@color/widget_on_surface_variant"
+        android:pathData="M10,54 L28,50.5 L35,34 L44,68 L54,28 L64,70 L73,40 L80,50.5 L98,54 L78,58 L73,50 L64,81 L54,44 L44,79 L35,46 L30,58 Z" />
+</vector>
